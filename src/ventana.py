@@ -3,16 +3,15 @@
 # ? gh
 # TODO:
 # * percase
-# // hola como estas
-import matplotlib.pyplot as plt
-
-import pygetwindow as gw
-import pyautogui
-import time
-import cv2
-import pytesseract
-import numpy as np
 import math
+import numpy as np
+import pytesseract
+import cv2
+import time
+import pyautogui
+import pygetwindow as gw
+import matplotlib.pyplot as plt
+# // hola como estas
 
 # ! Configuracion del Modelo
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -90,6 +89,23 @@ porcentaje_Y_Nombre = pAltura * 43
 cap_Ancho_Nombre = pAncho * 52
 cap_Alto_Nombre = pAltura * 16
 
+# Captura volver
+porcentaje_X_Volver_Cap = pAncho * 617
+porcentaje_Y_Volver_Cap = pAltura * 642
+cap_Ancho_Volver = pAncho * 100
+cap_Alto_Volver = pAltura * 30
+
+# Tiempo Heroe
+
+time_init = 0
+time_end = 0
+
+# Recolectar Recursos
+recurso_X = pAncho * 874
+recurso_Y = pAltura * 38
+tomar_X = pAncho * 973
+tomar_Y = pAltura * 654
+
 
 def plot_image(img, grayscale=True):
     plt.axis('off')
@@ -111,17 +127,11 @@ for window in windows:
         coc_window = gw.getWindowsWithTitle(window)[0]
         break
 
-grises = 0
-
 
 def is_gray(x, y, ancho, alto, crud=False, umbral=10):
-    global grises
     if crud:
         img = pyautogui.screenshot(
             region=[x, getY(y), getW(ancho), getH(alto)])
-        img.save(
-            fr'C:\Users\Windows\Documents\VISUAL STUDIO CODE\CLASH-OF-CLANS-AUTOMATIZACION\Screnshot\Capturas_Comparacion\grises_{grises}.png')
-        grises += 1
     else:
         img = pyautogui.screenshot(
             region=[getX(x), getY(y), getW(ancho), getH(alto)])
@@ -210,23 +220,27 @@ def cord(radius, points, x, y):
 
 def soltarHeroe(radio, puntos):
     cords = cord(radio, puntos, coc_window.width/2, coc_window.height/2)
-    pyautogui.click(getX(porcentaje_X_Heroe), getY(porcentaje_Y_Heroe))
-    time.sleep(0.1)
+    pyautogui.click(getX(porcentaje_X_Heroe), getY(
+        porcentaje_Y_Heroe), _pause=False)
+    time.sleep(0.3)
     for (x, y) in cords:
         x, y = ajustar_valores(x, y)
         punto0 = pyautogui.screenshot(region=[getX(porcentaje_X_Heroe_cap), getY(
             porcentaje_Y_Heroe_cap), getW(ancho_X_Heroe_cap), getH(alto_Y_Heroe_cap)])
+        # ! problema heroe no se suelta por exceso de velocidad
         pyautogui.click(x, y)
-        time.sleep(0.1)
+        time.sleep(0.2)
         punto1 = pyautogui.screenshot(region=[getX(porcentaje_X_Heroe_cap), getY(
             porcentaje_Y_Heroe_cap), getW(ancho_X_Heroe_cap), getH(alto_Y_Heroe_cap)])
-        if compare_images(punto0, punto1) <= 95:
+        print(compare_images(punto0, punto1))
+        if compare_images(punto0, punto1) <= 88:
             return True
 
     return False
 
 
 def heroe():
+    global time_init
     pyautogui.moveTo(coc_window.width/2, coc_window.height/2)
     pyautogui.scroll(-200)
     pyautogui.scroll(-200)
@@ -240,7 +254,7 @@ def heroe():
         while disaint:
             if soltarHeroe(radio, puntos):
                 disaint = False
-                print('se solto la tropa')
+                time_init = time.time()
             else:
                 puntos += 2
                 run += 1
@@ -259,11 +273,9 @@ def trops():
     contador = 0
     x = getX(porcentaje_X_Contador)
     while virat:
-        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, min=238, crud=True)) == 0:
+        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, min=253, crud=True)) == 0:
             virat = False
             contador -= 1
-            print(contador)
-            print('number trops')
             return contador
         else:
             contador += 1
@@ -276,27 +288,23 @@ def cart():
     while sent:
         if is_gray(x, porcentaje_Y_Contador, cont_ancho, trop_alto, crud=True):
             x += getW(cont_movimiento)
-            print('es gris')
         else:
-            print('no es gris')
             a, b = x + (getW(cont_ancho) / 2), getY(porcentaje_Y_Contador) + \
                 (getH(trop_alto) / 2)
-            print(a)
-            print(b)
             sent = False
             return a, b
 
 
 def soltarTr(x, y, trop):
-    pyautogui.click(x, y)
+    pyautogui.click(x, y, _pause=False)
     tesar = True
     radio = 250
-    puntos = 24
+    puntos = 10
     run = 1
     while tesar:
         if soltarTropa(radio, puntos, trop):
             tesar = False
-            print('se solto la tropa')
+            # print('se solto la tropa')
         else:
             puntos += 2
             run += 1
@@ -312,7 +320,7 @@ def soltarTropa(radio, puntos, iterador):
     pos = getW(cont_movimiento) * iterador
     for (x, y) in cords:
         x, y = ajustar_valores(x, y)
-        pyautogui.click(x, y)
+        pyautogui.click(x, y, _pause=False)
         contador += 1
         if contador == 24:
             #! problema no identifica si solto todas las tropas
@@ -320,8 +328,6 @@ def soltarTropa(radio, puntos, iterador):
                        cont_ancho, cont_alto, min=222, crud=True) != 'ox':
                 return False
             else:
-                #!ya devuelve lo que quiero
-                print('es lo que devuelve')
                 return True
 
     return False
@@ -329,6 +335,7 @@ def soltarTropa(radio, puntos, iterador):
 
 def tropa():
     trop = trops()
+    print(f'Cantidad de Tropas: {trop}')
     x, y = cart()
     soltarTr(x, y, trop)
 
@@ -375,35 +382,24 @@ def secondBattle():
 
 
 def volver():
-    print('volviendo')
     time.sleep(2.3)
-    pyautogui.click(getX(porcentaje_X_Volver), getY(porcentaje_Y_Volver))
+    pyautogui.click(getX(porcentaje_X_Volver), getY(
+        porcentaje_Y_Volver), _pause=False)
     time.sleep(1)
     while True:
         if len(getText(porcentaje_X_Nombre, porcentaje_Y_Nombre, cap_Ancho_Nombre, cap_Alto_Nombre, min=180, literal=True)) >= 4:
-            print('Estamos en casa')
             return True
         else:
             time.sleep(1)
 
 
-contador = 0
-
-
 def getText(x, y, ancho, alto, min=200, crud=False, literal=False):
-    global contador
     if crud:
         img = pyautogui.screenshot(region=[x, getY(
             y), getW(ancho), getH(alto)])
-        img.save(
-            fr'C:\Users\Windows\Documents\VISUAL STUDIO CODE\CLASH-OF-CLANS-AUTOMATIZACION\Screnshot\Capturas_Comparacion\color_{contador}.png')
-        contador += 1
     else:
         img = pyautogui.screenshot(region=[getX(x), getY(
             y), getW(ancho), getH(alto)])
-        img.save(
-            fr'C:\Users\Windows\Documents\VISUAL STUDIO CODE\CLASH-OF-CLANS-AUTOMATIZACION\Screnshot\Capturas_Comparacion\color_{contador}.png')
-        contador += 1
     img = np.array(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     _, th = cv2.threshold(gray, min, 255, cv2.THRESH_BINARY)
@@ -413,65 +409,104 @@ def getText(x, y, ancho, alto, min=200, crud=False, literal=False):
     else:
         text = pytesseract.image_to_string(th, config=options)
     text = text.strip()
-    print(text)
     return text
 
 
+contador = 1
 # * Ejecucion del Bot
-if coc_window:
-    # Obtener dimensiones y posición de la ventana
-    print(f"Posición: {coc_window.left}, {coc_window.top}")
-    print(f"Dimensiones: {coc_window.width}x{coc_window.height}")
+for i in range(2):
+    if coc_window:
+        # Obtener dimensiones y posición de la ventana
+        # print(f"Posición: {coc_window.left}, {coc_window.top}")
+        # print(f"Dimensiones: {coc_window.width}x{coc_window.height}")
 
-    # Activar la ventana (equivalente a Alt+Tab directo)
-    coc_window.activate()
+        # Activar la ventana (equivalente a Alt+Tab directo)
+        coc_window.activate()
 
-    # (Opcional) Mover el mouse a una posición dentro de la ventana
-    # pyautogui.moveTo(coc_window.left + 10, coc_window.top + 10)
-    # ! Notable reutilizacion de codigo a la vista
-    coc_window.moveTo(0, 0)
-    # Atacar
-    pyautogui.click(getX(porcentaje_X_Atacar), getY(
-        porcentaje_Y_Atacar))  # mover a boton atacar
+        # (Opcional) Mover el mouse a una posición dentro de la ventana
+        # pyautogui.moveTo(coc_window.left + 10, coc_window.top + 10)
+        # ! Notable reutilizacion de codigo a la vista
+        coc_window.moveTo(0, 0)
+        # Atacar
+        pyautogui.click(getX(porcentaje_X_Atacar), getY(
+            porcentaje_Y_Atacar))  # mover a boton atacar
 
-    # Buscar
-    time.sleep(0.1)
-    pyautogui.click(getX(porcentaje_X_Buscar), getY(
-        porcentaje_Y_Buscar))  # mover a boton atacar
+        # Buscar
+        time.sleep(0.1)
+        pyautogui.click(getX(porcentaje_X_Buscar), getY(
+            porcentaje_Y_Buscar))  # mover a boton atacar
 
-    # Leer Tiempo
-    trast = True
-    # Porcentaje
-    time.sleep(3)
-    while trast:
-        # ! ¿Inicio una partida?
-        time.sleep(1)
-        if len(getText(porcentaje_X_Tiempo, porcentaje_Y_Tiempo,
-                       ancho_Tiempo, alto_Tiempo)) >= 2:
-            print('La batalla Inicio')
-            print('Desplegar Tropas')
-            atacar()
-            while trast:
-                if final():
-                    print('Llegamos a cero, fin de la batalla')
-                    volver()
-                    trast = False
-                elif secondBattle():
-                    print('Segunda batalla')
-                    print('Desplegar Ejercito')
-                    time.sleep(10)
-                    atacar()
-                    while trast:
-                        time.sleep(0.4)
-                        if final():
-                            print('Esperar... Buscar volver y reinicio')
+        # Leer Tiempo
+        trast = True
+        # Porcentaje
+        time.sleep(3)
+        while trast:
+            # ! ¿Inicio una partida?
+            time.sleep(1)
+            if len(getText(porcentaje_X_Tiempo, porcentaje_Y_Tiempo,
+                           ancho_Tiempo, alto_Tiempo)) >= 2:
+                atacar()
+                slap = time.time()
+                while trast:
+                    if final():
+                        volver()
+                        trast = False
+                    elif secondBattle():
+                        print('Segunda batalla')
+                        time.sleep(10)
+                        if getText(porcentaje_X_Volver_Cap, porcentaje_Y_Volver_Cap, cap_Ancho_Volver, cap_Alto_Volver, literal=True, min=184) != 'Volver':
+                            atacar()
+                            while trast:
+                                if final():
+                                    volver()
+                                    trast = False
+                                else:
+                                    time_end = time.time()
+                                    endi = time_end - time_init
+                                    if endi >= 182:
+                                        print(f'Tiempo pasado : {endi}')
+                                        trast = False
+                                        volver()
+                                    else:
+                                        low = time.time()
+                                        if (low - slap) >= 3:
+                                            slap = time.time()
+                                            if getText(porcentaje_X_Volver_Cap, porcentaje_Y_Volver_Cap, cap_Ancho_Volver, cap_Alto_Volver, literal=True, min=184) == 'Volver':
+                                                volver()
+                                                trast = False
+                        else:
+                            print('Se encontro volver')
                             volver()
                             trast = False
-                else:
-                    time.sleep(0.5)
+                    else:
+                        time.sleep(0.2)
+                        time_end = time.time()
+                        endi = time_end - time_init
+                        if endi >= 182:
+                            print(f'Tiempo pasado : {endi}')
+                            trast = False
+                            volver()
+                        else:
+                            low = time.time()
+                            if (low - slap) >= 3:
+                                slap = time.time()
+                                if getText(porcentaje_X_Volver_Cap, porcentaje_Y_Volver_Cap, cap_Ancho_Volver, cap_Alto_Volver, literal=True, min=184) == 'Volver':
+                                    volver()
+                                    trast = False
 
-        else:
-            print('Esperando a la batalla')
+            else:
+                print('Esperando a la batalla')
 
-else:
-    print("No se encontró la ventana de 'Clash of Clans'.")
+    else:
+        print("No se encontró la ventana de 'Clash of Clans'.")
+
+    print(f'Partida numero {contador}')
+    if (contador % 10) == 0:
+        time.sleep(0.2)
+        pyautogui.click(getX(recurso_X), getY(recurso_Y), _pause=False)
+        time.sleep(0.3)
+        pyautogui.click(getX(tomar_X), getY(tomar_Y), _pause=False)
+        time.sleep(0.1)
+        pyautogui.click(getX(porcentaje_X_Atacar), getY(porcentaje_Y_Atacar))
+
+    contador += 1
