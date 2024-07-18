@@ -273,7 +273,7 @@ def trops():
     contador = 0
     x = getX(porcentaje_X_Contador)
     while virat:
-        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, min=253, crud=True)) == 0:
+        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, min=222, crud=True)) == 0:
             virat = False
             contador -= 1
             return contador
@@ -414,7 +414,8 @@ def getText(x, y, ancho, alto, min=200, crud=False, literal=False):
 
 contador = 1
 # * Ejecucion del Bot
-for i in range(2):
+for i in range(200):
+    print('-'*30)
     if coc_window:
         # Obtener dimensiones y posición de la ventana
         # print(f"Posición: {coc_window.left}, {coc_window.top}")
