@@ -273,7 +273,7 @@ def trops():
     contador = 0
     x = getX(porcentaje_X_Contador)
     while virat:
-        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, min=222, crud=True)) == 0:
+        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, min=250, crud=True)) == 0:
             virat = False
             contador -= 1
             return contador
@@ -391,7 +391,6 @@ def volver():
             return True
         else:
             time.sleep(1)
-
 
 def getText(x, y, ancho, alto, min=200, crud=False, literal=False):
     if crud:
