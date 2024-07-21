@@ -54,7 +54,7 @@ ataque = {
     'punto_X_4': pAncho * 695,
     'punto_Y_4': pAltura * 623
 }
-
+#! Probando ramas
 # Heroe
 porcentaje_X_Heroe = pAncho * 234
 porcentaje_Y_Heroe = pAltura * 716
