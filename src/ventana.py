@@ -43,17 +43,6 @@ porcentaje_X_Destruccion = pAncho * 1142
 porcentaje_Y_Destruccion = pAltura * 601
 ancho_Destruccion = pAncho * 161
 alto_Destruccion = pAltura * 32
-# Rango de ataque
-ataque = {
-    'punto_X_1': pAncho * 331,
-    'punto_Y_1': pAltura * 375,
-    'punto_X_2': pAncho * 708,
-    'punto_Y_2': pAltura * 99,
-    'punto_X_3': pAncho * 1043,
-    'punto_Y_3': pAltura * 366,
-    'punto_X_4': pAncho * 695,
-    'punto_Y_4': pAltura * 623
-}
 
 # Heroe
 porcentaje_X_Heroe = pAncho * 234
