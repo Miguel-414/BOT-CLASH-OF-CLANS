@@ -199,13 +199,12 @@ def soltarHeroe(radio, puntos):
     time.sleep(0.3)
     for (x, y) in cords:
         x, y = ajustar_valores(x, y)
-        punto0 = pyautogui.screenshot(region=[getX(porcentaje_X_Heroe_cap), getY(
-            porcentaje_Y_Heroe_cap), getW(ancho_X_Heroe_cap), getH(alto_Y_Heroe_cap)])
-        # ! problema heroe no se suelta por exceso de velocidad
+        punto0 = pyautogui.screenshot(region=[getX(porcentaje_X_Heroe_cap),
+                                              getY(porcentaje_Y_Heroe_cap), getW(ancho_X_Heroe_cap), getH(alto_Y_Heroe_cap)])
         pyautogui.click(x, y)
         time.sleep(0.2)
-        punto1 = pyautogui.screenshot(region=[getX(porcentaje_X_Heroe_cap), getY(
-            porcentaje_Y_Heroe_cap), getW(ancho_X_Heroe_cap), getH(alto_Y_Heroe_cap)])
+        punto1 = pyautogui.screenshot(region=[getX(porcentaje_X_Heroe_cap),
+                                              getY(porcentaje_Y_Heroe_cap), getW(ancho_X_Heroe_cap), getH(alto_Y_Heroe_cap)])
         print(compare_images(punto0, punto1))
         if compare_images(punto0, punto1) <= 88:
             return True
@@ -221,14 +220,13 @@ def heroe():
     pyautogui.scroll(-200)
     time.sleep(0.1)  # !
     if not (is_gray(porcentaje_X_Heroe_cap, porcentaje_Y_Heroe_cap, ancho_X_Heroe_cap, alto_Y_Heroe_cap)):
-        disaint = True
         radio = 300
         puntos = 4
         run = 1
-        while disaint:
+        while True:
             if soltarHeroe(radio, puntos):
-                disaint = False
                 time_init = time.time()
+                break
             else:
                 puntos += 2
                 run += 1
@@ -254,7 +252,7 @@ def trops():
             if contador != -1:
                 return contador
             print('Hubo un -1 no se alarmen somos la Policia')
-            conf = randint(235,252)
+            conf = randint(235, 252)
         else:
             contador += 1
             x += getW(cont_movimiento)
@@ -369,6 +367,7 @@ def volver():
             return True
         else:
             time.sleep(1)
+
 
 def getText(x, y, ancho, alto, min=200, crud=False, literal=False):
     if crud:
