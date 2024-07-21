@@ -234,20 +234,15 @@ def heroe():
                     run = 0
                     radio += 50
 
-        # ! Desplegar tropa en uno de los puntos dados por el circulo
-        # ? Revisar si la imagen dio señas de haberse desplegado
-
     time.sleep(1)
 
 
 def trops():
-    virat = True
     contador = 0
     conf = 253
     x = getX(porcentaje_X_Contador)
-    while virat:
+    while True:
         if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, conf, crud=True)) == 0:
-            virat = False
             contador -= 1
             if contador != -1:
                 return contador
@@ -259,28 +254,24 @@ def trops():
 
 
 def cart():
-    sent = True
     x = getX(porcentaje_X_Contador)
-    while sent:
+    while True:
         if is_gray(x, porcentaje_Y_Contador, cont_ancho, trop_alto, crud=True):
             x += getW(cont_movimiento)
         else:
             a, b = x + (getW(cont_ancho) / 2), getY(porcentaje_Y_Contador) + \
                 (getH(trop_alto) / 2)
-            sent = False
             return a, b
 
 
 def soltarTr(x, y, trop):
     pyautogui.click(x, y, _pause=False)
-    tesar = True
     radio = 250
     puntos = 10
     run = 1
-    while tesar:
+    while True:
         if soltarTropa(radio, puntos, trop):
-            tesar = False
-            # print('se solto la tropa')
+            break
         else:
             puntos += 2
             run += 1
@@ -370,20 +361,14 @@ def volver():
 
 
 def getText(x, y, ancho, alto, min=200, crud=False, literal=False):
-    if crud:
-        img = pyautogui.screenshot(region=[x, getY(
-            y), getW(ancho), getH(alto)])
-    else:
-        img = pyautogui.screenshot(region=[getX(x), getY(
-            y), getW(ancho), getH(alto)])
+    x = getX(x) if not crud else x
+    img = pyautogui.screenshot(region=[x, getY(y), getW(ancho), getH(alto)])
     img = np.array(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     _, th = cv2.threshold(gray, min, 255, cv2.THRESH_BINARY)
     th = cv2.bitwise_not(th)
-    if crud or literal:
-        text = pytesseract.image_to_string(th)
-    else:
-        text = pytesseract.image_to_string(th, config=options)
+    config = None if (crud or literal) else options
+    text = pytesseract.image_to_string(th, config=config)
     text = text.strip()
     return text
 
