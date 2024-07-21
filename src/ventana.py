@@ -119,25 +119,16 @@ for window in windows:
 
 
 def is_gray(x, y, ancho, alto, crud=False, umbral=10):
-    if crud:
-        img = pyautogui.screenshot(
-            region=[x, getY(y), getW(ancho), getH(alto)])
-    else:
-        img = pyautogui.screenshot(
-            region=[getX(x), getY(y), getW(ancho), getH(alto)])
-
+    x = getX(x) if not crud else x
+    img = pyautogui.screenshot(region=[x, getY(y), getW(ancho), getH(alto)])
     imagen_np = np.array(img)
-
     # Si la imagen tiene un canal alfa, eliminarlo
     if imagen_np.shape[-1] == 4:
         imagen_np = imagen_np[:, :, :3]
-
     # Calcular la desviación estándar a lo largo del eje de los canales de color
     std_dev = np.std(imagen_np, axis=-1)
-
     # Calcular la media de las desviaciones estándar
     mean_std_dev = np.mean(std_dev)
-
     # Comparar con el umbral
     if mean_std_dev < umbral:
         return True  # La imagen es mayormente gris
@@ -160,13 +151,6 @@ def compare_images(image1, image2):
 
     return similarity_score
 
-
-# pyautogui.locate
-# pyautogui.locateAll
-# !pyautogui.locateAllOnScreen Devuelve una especie de lista que solo se puede iterar a traves de un loop
-# pyautogui.locateCenterOnScreen
-# pyautogui.locateOnScreen
-# pyautogui.locateOnWindow
 
 #! ajustar a porcentajes
 def ajustar_valores(x, y):
@@ -413,26 +397,14 @@ for i in range(200):
         # Obtener dimensiones y posición de la ventana
         # print(f"Posición: {coc_window.left}, {coc_window.top}")
         # print(f"Dimensiones: {coc_window.width}x{coc_window.height}")
-
-        # Activar la ventana (equivalente a Alt+Tab directo)
         coc_window.activate()
-
-        # (Opcional) Mover el mouse a una posición dentro de la ventana
-        # pyautogui.moveTo(coc_window.left + 10, coc_window.top + 10)
-        # ! Notable reutilizacion de codigo a la vista
         coc_window.moveTo(0, 0)
-        # Atacar
         pyautogui.click(getX(porcentaje_X_Atacar), getY(
             porcentaje_Y_Atacar))  # mover a boton atacar
-
-        # Buscar
         time.sleep(0.1)
         pyautogui.click(getX(porcentaje_X_Buscar), getY(
             porcentaje_Y_Buscar))  # mover a boton atacar
-
-        # Leer Tiempo
         trast = True
-        # Porcentaje
         time.sleep(3)
         while trast:
             # ! ¿Inicio una partida?
