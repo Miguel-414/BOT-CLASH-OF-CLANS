@@ -11,6 +11,7 @@ import time
 import pyautogui
 import pygetwindow as gw
 import matplotlib.pyplot as plt
+from random import randint
 # // hola como estas
 
 # ! Configuracion del Modelo
@@ -271,12 +272,16 @@ def heroe():
 def trops():
     virat = True
     contador = 0
+    conf = 253
     x = getX(porcentaje_X_Contador)
     while virat:
-        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, min=250, crud=True)) == 0:
+        if len(getText(x, porcentaje_Y_Contador, cont_ancho, cont_alto, conf, crud=True)) == 0:
             virat = False
             contador -= 1
-            return contador
+            if contador != -1:
+                return contador
+            print('Hubo un -1 no se alarmen somos la Policia')
+            conf = randint(235,252)
         else:
             contador += 1
             x += getW(cont_movimiento)
