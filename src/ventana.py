@@ -1,8 +1,3 @@
-
-# ! Con
-# ? gh
-# TODO:
-# * percase
 import math
 import numpy as np
 import pytesseract
@@ -12,7 +7,7 @@ import pyautogui
 import pygetwindow as gw
 import matplotlib.pyplot as plt
 from random import randint
-# // hola como estas
+
 
 # ! Configuracion del Modelo
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -20,6 +15,7 @@ psm = 7
 alphanumeric = "axMsO0123456789"
 options = "-c tessedit_char_whitelist={}".format(alphanumeric)
 options += "--oem 3 --psm {}".format(psm)
+
 # * Declaracion de variables
 # Dimensiones
 pAncho = 100/1339
@@ -86,7 +82,6 @@ cap_Ancho_Volver = pAncho * 100
 cap_Alto_Volver = pAltura * 30
 
 # Tiempo Heroe
-
 time_init = 0
 time_end = 0
 
@@ -215,10 +210,8 @@ def soltarHeroe(radio, puntos):
 def heroe():
     global time_init
     pyautogui.moveTo(coc_window.width/2, coc_window.height/2)
-    pyautogui.scroll(-200)
-    pyautogui.scroll(-200)
-    pyautogui.scroll(-200)
-    time.sleep(0.1)  # !
+    for _ in range(3): pyautogui.scroll(-200)
+    time.sleep(0.1)
     if not (is_gray(porcentaje_X_Heroe_cap, porcentaje_Y_Heroe_cap, ancho_X_Heroe_cap, alto_Y_Heroe_cap)):
         radio = 300
         puntos = 4
