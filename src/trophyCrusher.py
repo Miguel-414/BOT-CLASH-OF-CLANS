@@ -6,6 +6,8 @@ import time
 import pyautogui
 import pygetwindow as gw
 from random import randint
+from colorama import init, Fore
+init(autoreset=True)
 
 
 class ClashBot:
@@ -15,13 +17,14 @@ class ClashBot:
         pytesseract.pytesseract.tesseract_cmd = self.pytesseract_path
         self.psm = 7
         self.alphanumeric = "axMsO0123456789"
-        self.options = "-c tessedit_char_whitelist={}".format(
-            self.alphanumeric)
-        self.options += " --oem 3 --psm {}".format(self.psm)
+        self.options = f"-c tessedit_char_whitelist={self.alphanumeric}"
+        self.options += f" --oem 3 --psm {self.psm}"
         self.init_dimensions()
         self.coc_window = self.get_coc_window()
         self.time_init = 0
         self.time_end = 0
+        self.time_battle = 0
+        self.general_time = 0
 
     def init_dimensions(self):
         self.pAncho = 100 / 1339
@@ -33,7 +36,6 @@ class ClashBot:
             "atacar": (self.pAncho * 79, self.pAltura * 695),
             "buscar": (self.pAncho * 994, self.pAltura * 517),
             "tiempo": (self.pAncho * 589, self.pAltura * 60, self.pAncho * 190, self.pAltura * 64),
-            "tropa": (self.pAncho * 331, self.pAltura * 712),
             "destruccion": (self.pAncho * 1142, self.pAltura * 601, self.pAncho * 161, self.pAltura * 32),
             "heroe": (self.pAncho * 234, self.pAltura * 716),
             "heroe_cap": (self.pAncho * 191, self.pAltura * 663, self.pAncho * 74, self.pAltura * 100),
@@ -47,7 +49,11 @@ class ClashBot:
                 "y": (self.pAltura * 624, self.pAltura * 112, self.pAltura * 542)
             },
             "contador": (self.pAncho * 291, self.pAltura * 662, self.pAncho * 72,
-                         self.pAltura * 20, self.pAltura * 80, self.pAncho * 87)
+                         self.pAltura * 20, self.pAltura * 80, self.pAncho * 87),
+            "rendirse": {
+                1: (self.pAncho * 83, self.pAltura * 584),
+                2: (self.pAncho * 704, self.pAltura * 487)
+            }
         }
 
     def get_coc_window(self):
@@ -60,11 +66,11 @@ class ClashBot:
     def setTrast(self,slap):
         self.time_end = time.time()
         if (self.time_end - self.time_init) >= 182:
-            self.volver
+            self.volver()
             return  False
         else:
             low = time.time()
-            if (low - self.slap) >= 3:
+            if (low - slap) >= 3:
                 self.slap = time.time()
                 if self.text(self.positions["volver_cap"][0], self.positions["volver_cap"][1], self.positions["volver_cap"][2], self.positions["volver_cap"][3], literal=True, min=184) == 'Volver':
                     self.volver()
@@ -77,8 +83,10 @@ class ClashBot:
                   self.positions["destruccion"][2], self.positions["destruccion"][3]).find('100') != -1 and self.text(self.positions["tiempo"][0], self.positions["tiempo"][1],
                                                                                      self.positions["tiempo"][2], self.positions["tiempo"][3]) != '0s' and self.text(self.positions["tiempo"][0], self.positions["tiempo"][1],
                                                                                                                                     self.positions["tiempo"][2], self.positions["tiempo"][3]) != 'Os'
-    def volver(self):
-        time.sleep(2.3)
+    def volver(self,tiempo=2.3):
+        self.time_end = time.time()
+        print(Fore.BLUE + f'La partida duro {round(self.time_end - self.time_init,1)} segundos')
+        time.sleep(tiempo)
         pyautogui.click(self.getX(self.positions["volver"][0]), 
                         self.getY(self.positions["volver"][1]), _pause=False)
         time.sleep(1)
@@ -161,6 +169,7 @@ class ClashBot:
     
     def tropa(self):
         trop = self.trops()
+        print(Fore.CYAN + f'Numero de cartas : {trop + 1}')
         x, y = self.cart()
         self.soltarTropa(x,y,trop)
 
@@ -204,20 +213,17 @@ class ClashBot:
 
     def soltarHeroe(self, radio, puntos):
         cords = self.cord(radio, puntos, self.coc_window.width / 2, self.coc_window.height / 2)
-        pyautogui.click(self.getX(self.positions["heroe"][0]), self.getY(self.positions["heroe"][1]), _pause=False)
+        time.sleep(0.2)
+        pyautogui.click(self.getX(self.positions["heroe"][0]), self.getY(self.positions["heroe"][1]))
         time.sleep(0.3)
         for (x, y) in cords:
             x, y = self.ajustar_valores(x, y)
-            punto0 = pyautogui.screenshot(region=[self.getX(self.positions["heroe_cap"][0]),
-                                                  self.getY(self.positions["heroe_cap"][1]),
-                                                  self.getW(self.positions["heroe_cap"][2]),
-                                                  self.getH(self.positions["heroe_cap"][3])])
+            punto0 = pyautogui.screenshot(region=[self.getX(self.positions["heroe_cap"][0]),self.getY(self.positions["heroe_cap"][1]),
+                                                  self.getW(self.positions["heroe_cap"][2]),self.getH(self.positions["heroe_cap"][3])])
             pyautogui.click(x, y)
             time.sleep(0.2)
-            punto1 = pyautogui.screenshot(region=[self.getX(self.positions["heroe_cap"][0]),
-                                                  self.getY(self.positions["heroe_cap"][1]),
-                                                  self.getW(self.positions["heroe_cap"][2]),
-                                                  self.getH(self.positions["heroe_cap"][3])])
+            punto1 = pyautogui.screenshot(region=[self.getX(self.positions["heroe_cap"][0]),self.getY(self.positions["heroe_cap"][1]),
+                                                  self.getW(self.positions["heroe_cap"][2]),self.getH(self.positions["heroe_cap"][3])])
             if self.compare_images(punto0, punto1) <= 88:
                 return True
         return False
@@ -233,11 +239,9 @@ class ClashBot:
         return mean_std_dev < umbral
 
     def heroe(self):
-        self.time_init = time.time()
         pyautogui.moveTo(self.coc_window.width / 2, self.coc_window.height / 2)
-        time.sleep(0.2)
-        for _ in range(3): pyautogui.scroll(-200)
-        print('aqui scroll')
+        time.sleep(0.9)
+        for _ in range(5): pyautogui.scroll(-200)
         time.sleep(0.1)
         if not self.is_gray(self.positions["heroe_cap"][0], self.positions["heroe_cap"][1],
                             self.positions["heroe_cap"][2], self.positions["heroe_cap"][3]):
@@ -254,7 +258,7 @@ class ClashBot:
                     if run == 3:
                         run = 0
                         radio += 50
-        time.sleep(1)
+        #time.sleep(1) #! Revision
 
     def text(self, x, y, w, h, min=200, crud=False, literal=False):
         x = self.getX(x) if not crud else x
@@ -280,8 +284,11 @@ class ClashBot:
     def getH(self, height):
         return int(height / (100 / self.coc_window.height))
 
-    def start(self):
-        for i in range(10):
+    def start(self,partidas):
+        self.general_time = time.time()
+        print(Fore.GREEN + 'Trophy Crusher')
+        for i in range(partidas):
+            print(Fore.MAGENTA + '-'*30)
             if self.coc_window:
                 self.coc_window.activate()
                 self.coc_window.moveTo(0, 0)
@@ -294,52 +301,63 @@ class ClashBot:
                 time.sleep(3)
                 while trast:
                     time.sleep(1)
-                    if len(self.text(self.positions["tiempo"][0],
-                                     self.positions["tiempo"][1],
-                                     self.positions["tiempo"][2],
-                                     self.positions["tiempo"][3])) >= 2:
+                    if len(self.text(self.positions["tiempo"][0],self.positions["tiempo"][1],
+                                     self.positions["tiempo"][2],self.positions["tiempo"][3])) >= 2:
+                        self.time_battle = time.time()
                         self.heroe()
                         self.tropa()
                         self.slap = time.time()
+                        pyautogui.click(self.getX(self.positions["rendirse"][1][0]),self.getY(self.positions["rendirse"][1][1]))
+                        time.sleep(0.2)
+                        pyautogui.click(self.getX(self.positions["rendirse"][2][0]),self.getY(self.positions["rendirse"][2][1]))
+                        self.volver(0.3)
+                        trast = False
                         while trast:
                             if self.final():
+                                print(Fore.LIGHTBLUE_EX + f'La batalla duro {round(time.time() - self.time_battle,1)} segundos')
                                 self.volver()
                                 trast = False
                             elif self.secondBatle():
+                                print(Fore.LIGHTBLUE_EX + f'La etapa uno duro {round(time.time() - self.time_battle,1)} segundos')
                                 time.sleep(10)
                                 if self.text(self.positions["volver_cap"][0], self.positions["volver_cap"][1], self.positions["volver_cap"][2], self.positions["volver_cap"][3], literal=True, min=184) != 'Volver':
+                                    self.time_battle = time.time()
                                     self.heroe()
                                     self.tropa()
                                     while trast:
                                         if self.final():
+                                            print(Fore.LIGHTBLUE_EX + f'La segunda etapa duro {round(time.time() - self.time_battle,1)} segundos')
                                             self.volver()
                                             trast = False
                                         else:
                                             trast = self.setTrast(self.slap)
+                                            if not trast: print(Fore.LIGHTBLUE_EX + f'La segunda etapa duro {round(time.time() - self.time_battle,1)} segundos')
                                 else:
+                                    print(Fore.LIGHTBLUE_EX + f'La batalla duro {round(time.time() - self.time_battle,1)} segundos')
                                     self.volver()
                                     trast = False
                             else:
                                 time.sleep(0.2)
                                 trast = self.setTrast(self.slap)
+                                if not trast: print(Fore.LIGHTBLUE_EX + f'La batalla duro {round(time.time() - self.time_battle,1)} segundos')
                                 
                         
                     else: 
-                        print('Esperando la Batalla')
+                        print(Fore.LIGHTGREEN_EX + 'Esperando la Batalla')
 
             else:
-                print('No se encontro la ventana de clash of Clans')
+                print(Fore.LIGHTRED_EX + 'No se encontro la ventana de clash of Clans')
 
-            print(f'Partida numero {i + 1}')
-            if ((i + 1) % 10) == 0:
-                time.sleep(0.2)
-                time.sleep(0.2)
+            print(Fore.CYAN + f'Partida numero {i + 1}')
+            if ((i + 1) % 5) == 0:
+                for i in range(3): pyautogui.scroll(-200)
+                time.sleep(0.5)
                 pyautogui.click(self.getX(self.positions["recurso"][0]),
                                 self.getY(self.positions["recurso"][1]), _pause=False)
-                time.sleep(0.3)
+                time.sleep(0.4)
                 pyautogui.click(self.getX(self.positions["tomar"][0]),
                                 self.getY(self.positions["tomar"][1]), _pause=False)
-                time.sleep(0.1)
+                time.sleep(0.2)
                 pyautogui.click(self.getX(self.positions["atacar"][0]),
                                 self.getY(self.positions["atacar"][1]))
 
@@ -347,4 +365,13 @@ class ClashBot:
 
 if __name__ == "__main__":
     bot = ClashBot()
-    bot.start()
+    try:
+        bot.start(400)
+    except KeyboardInterrupt:
+        print(Fore.RED + 'Su programa se a detenido exitosamente')
+    except BaseException as ex:
+        print(Fore.YELLOW + f'Error inesperado : {ex}')
+        print(Fore.YELLOW + f'Tipo de error : {type(ex).__name__}')
+    finally:
+        print(Fore.LIGHTMAGENTA_EX + f'Tiempo activo : {round(time.time() - bot.general_time,1)} segundos')
+        print(Fore.YELLOW + 'Gracias por usar mi Bot')
